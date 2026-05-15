@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech.S AI - Chat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body class="light-mode">
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="TECH S Logo" width="40">
+            Tech.S AI
+        </div>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="#chat">Chat</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="/login/">Login</a></li>
+            <li><a href="/logout/">Logout</a></li>
+        </ul>
+        <button class="hamburger" id="hamburger">
+            <i class="fas fa-bars"></i>
+        </button>
+        <button class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">
+            <i class="fas fa-moon"></i>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1 class="section-title">AI Chat Assistant</h1>
+        <p class="page-intro">Choose your AI model and start chatting with the future of artificial intelligence.</p>
+
+        <!-- AI Model Selection -->
+        <section class="ai-models">
+            <h2 style="text-align: center; font-size: 1.8rem; margin-bottom: 2rem; color: var(--text-primary);">Select
+                Your AI Model</h2>
+            <div class="models-grid">
+                <div class="model-card" data-model="Qwen">
+                    <div class="model-icon">
+                        <img src="{{ url_for('static', filename='qwen.png') }}" alt="Qwen Logo">
+                    </div>
+                    <h3>Qwen</h3>
+                    <p>Advanced language model by Alibaba Cloud, excels in understanding and generating human-like text.
+                    </p>
+                </div>
+                <div class="model-card" data-model="Deepseek">
+                    <div class="model-icon">
+                        <img src="{{ url_for('static', filename='deepseek.png') }}" alt="Deepseek Logo">
+                    </div>
+                    <h3>Deepseek</h3>
+                    <p>Powerful AI for deep reasoning and complex problem-solving tasks.</p>
+                </div>
+                <div class="model-card" data-model="Gemini">
+                    <div class="model-icon">
+                        <img src="{{ url_for('static', filename='gemini.png') }}" alt="Gemini Logo">
+                    </div>
+                    <h3>Gemini</h3>
+                    <p>Google's multimodal AI, capable of understanding text, images, and more.</p>
+                </div>
+                <div class="model-card" data-model="Nvidia Nemotron">
+                    <div class="model-icon">
+                        <img src="{{ url_for('static', filename='nvidia.png') }}" alt="Nvidia Logo">
+                    </div>
+                    <h3>Nvidia Nemotron</h3>
+                    <p>Efficient and fast AI model focused on performance and accuracy.</p>
+                </div>
+                <div class="model-card" data-model="Sarvam">
+                    <div class="model-icon">
+                        <img src="{{ url_for('static', filename='sarvam.png') }}" alt="Sarvam Logo">
+                    </div>
+                    <h3>Sarvam</h3>
+                    <p>Multilingual AI specializing in diverse language understanding.</p>
+                </div>
+                <div class="model-card" data-model="ChatGPT">
+                    <div class="model-icon">
+                        <img src="{{ url_for('static', filename='chatgpt.png') }}" alt="ChatGPT Logo">
+                    </div>
+                    <h3>ChatGPT</h3>
+                    <p>OpenAI's conversational AI, great for natural language interactions.</p>
+                </div>
+                <div class="model-card" data-model="Z.ai">
+                    <div class="model-icon">
+                        <img src="{{ url_for('static', filename='Zai.png') }}" alt="Z.ai Logo">
+                    </div>
+                    <h3>Z.ai</h3>
+                    <p>AI with advanced vision capabilities for image and text analysis.</p>
+                </div>
+                <div class="model-card" data-model="Meta Ai">
+                    <div class="model-icon">
+                        <img src="{{ url_for('static', filename='metaai.png') }}" alt="Meta AI Logo">
+                    </div>
+                    <h3>Meta AI</h3>
+                    <p>Meta's AI models for social and interactive applications.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat Section -->
+        <section class="chat-section" id="chat">
+            <div class="chat-grid">
+                <aside class="history-section" id="history-section">
+                    <h3 class="history-title">Chat History</h3>
+                    <div class="history-list">
+                        {% if history %}
+                            {% for chat in history %}
+                                <article class="history-item">
+                                    <div class="history-item-header">
+                                        <span class="history-model">{{ chat.ai_model or 'AI' }}</span>
+                                        <span class="history-timestamp">{{ chat.created_at if chat.created_at else '' }}</span>
+                                    </div>
+                                    <p class="history-question"><strong>You:</strong> {{ chat.question }}</p>
+                                    <p class="history-answer"><strong>Reply:</strong> {{ chat.answer }}</p>
+                                </article>
+                            {% endfor %}
+                        {% else %}
+                            <div class="no-history">No previous conversations yet. Your chat history will appear here.</div>
+                        {% endif %}
+                    </div>
+                </aside>
+
+                <div class="chat-panel">
+                    <button class="btn btn-secondary toggle-history-btn" id="toggle-history">View Chat History</button>
+                    <form method="POST" class="chat-form" id="chat-form">
+                        <input type="hidden" name="aimodel" id="selected-model" value="">
+                        <div class="form-group">
+                            <label for="ai_chat" class="form-label">Your Message:</label>
+                            <input type="text" name="chat" class="form-input" id="ai_chat"
+                                placeholder="Type your message here..." required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="send-button">Send Message</button>
+                    </form>
+
+                    <div class="response-section">
+                        <h3 class="response-title">Tech.S AI Response:</h3>
+                        <div class="response-box" id="response-box">{{ ans if ans else "Your response will appear here after sending a message." }}</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

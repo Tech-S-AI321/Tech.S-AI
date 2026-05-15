@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech.S AI - Next Generation AI Platform</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="light-mode">
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="TECH S Logo" width="40">
+            Tech.S AI
+        </div>
+        <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="/login/">Login</a></li>
+            <li><a href="/signup/">Sign Up</a></li>
+        </ul>
+        <button class="hamburger" id="hamburger">
+            <i class="fas fa-bars"></i>
+        </button>
+        <button class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">
+            <i class="fas fa-moon"></i>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Welcome to Tech.S AI</h1>
+            <p>Experience the future of artificial intelligence. Powerful, intuitive, and designed for innovation.</p>
+            <div class="cta-buttons">
+                <a href="{{ url_for('chat') }}" class="btn btn-primary">Start Chatting</a>
+                <a href="/signup/" class="btn btn-secondary">Get Started Now</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <h2 class="section-title">Why Choose Tech.S AI?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Lightning Fast</h3>
+                <p>Experience blazing-fast AI processing with optimized algorithms and cloud infrastructure.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Secure & Reliable</h3>
+                <p>Enterprise-grade security with end-to-end encryption and 99.9% uptime guarantee.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <h3>Easy Integration</h3>
+                <p>Simple APIs and SDKs to integrate AI into your existing applications seamlessly.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Advanced Analytics</h3>
+                <p>Deep insights and real-time analytics to understand and optimize your AI models.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>24/7 Support</h3>
+                <p>Our expert team is always ready to help you succeed with dedicated customer support.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-infinity"></i>
+                </div>
+                <h3>Scalable Solution</h3>
+                <p>Grow without limits. Our infrastructure scales automatically with your needs.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h2>8</h2>
+                <p>AI Models</p>
+            </div>
+            <div class="stat-item">
+                <h2>1</h2>
+                <p>App</p>
+            </div>
+            <div class="stat-item">
+                <h2>July 10</h2>
+                <p>Coming Soon</p>
+            </div>
+            <div class="stat-item">
+                <h2>🇮🇳</h2>
+                <p>Made in India</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="contact">
+        <h2>Ready to Transform Your Business?</h2>
+        <p>Use Tech.S AI to revolutionize your knowledge.</p>
+        <button class="btn btn-primary">Start Your Free Trial</button>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Tech.S AI</h3>
+                <p>Empowering businesses with cutting-edge artificial intelligence solutions.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Product</h3>
+                <ul>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">Security</a></li>
+                    <li><a href="#">Roadmap</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Company</h3>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">API Docs</a></li>
+                    <li><a href="#">Support</a></li>
+                    <li><a href="#">Community</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Tech.S AI. All rights reserved.</p>
+        </div>
+    </footer>
+
+        <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
