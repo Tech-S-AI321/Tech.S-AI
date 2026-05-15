@@ -8,7 +8,7 @@ const ASSETS = [
   '/css/styles.css',
   '/js/main.js',
   '/manifest.json',
-  '/static/icon.png',
+  '/icon.png',
   '/static/favicon.ico',
   '/static/chatgpt.png',
   '/static/deepseek.png',
