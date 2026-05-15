@@ -1,0 +1,17 @@
+{
+  "name": "Tech.S AI",
+  "short_name": "Tech.S AI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#317EFB",
+  "description": "An awesome installable web app hosted on Render.",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
