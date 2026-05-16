@@ -1,4 +1,4 @@
-from flask import Flask,request,render_template,url_for,redirect,jsonify,session
+from flask import Flask,request,render_template,url_for,redirect,jsonify,session,send_from_directory
 import requests
 from google import genai
 from google.genai import types
@@ -25,13 +25,16 @@ sarvam_key = os.getenv("SARVAMAI_KEY")
 groq_key = os.getenv("GROQ_KEY")
 deepseek_key:str = os.getenv('Deepseek_KEY')
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY')
 app.permanent_session_lifetime = timedelta(days=90)
 
 @app.route('/')
 def home():
     return render_template('home.html')
+@app.route('/icon.png')
+def serve_icon():
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'icon.png')
 
 @app.route('/signup/',methods=['GET','POST'])
 def signup():
