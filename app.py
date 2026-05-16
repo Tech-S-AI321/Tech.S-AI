@@ -1,6 +1,7 @@
 from flask import Flask,request,render_template,url_for,redirect,jsonify,session
 import requests
 from google import genai
+from google.genai import types
 from sarvamai import SarvamAI
 from openai import OpenAI
 from groq import Groq
@@ -72,7 +73,7 @@ def login():
     return render_template('login.html',error=error, success=success)
 
 #OPENROUTER:-
-def ask_ai(prompt,model,des):
+def ask_ai(prompt,model,des,history):
     try:
         url = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -84,7 +85,7 @@ def ask_ai(prompt,model,des):
         data = {
             "model": model,
             "messages": [
-                {"role": "system", "content": des},
+                {"role": "system", "content": f'{des}, The memory = {history}'},
                 {"role": "user", "content": prompt}
             ]
         }
@@ -102,25 +103,28 @@ def ask_ai(prompt,model,des):
         return f"Sorry sir there is an error.{e}"
 
 #Gemini
-def ask_gemini(prompt):
+def ask_gemini(prompt,history):
     try:
         client = genai.Client(api_key=gemini_key)
         response = client.models.generate_content(
             model="gemini-flash-latest",
-            contents=prompt
+            contents=prompt,
+            config=types.GenerateContentConfig(
+            system_instruction=f"This is your memory={history}."
+            )
         )
         return response.text
     except Exception as e:
         return f"Error: {e}"
 
 #Sarvam
-def ask_sarvam(prompt):
+def ask_sarvam(prompt,history):
     try:
         client = SarvamAI(api_subscription_key=sarvam_key)
         response = client.chat.completions(
             model="sarvam-m",
             messages=[
-                {"role": "system", "content": "You are a helpful AI assistant. Never show your thinking process. Only give the final answer directly."},
+                {"role": "system", "content": f"You are a helpful AI assistant. Only give the final answer directly. And this is your memory-{history}"},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -135,12 +139,14 @@ def ask_sarvam(prompt):
 #Deepseek 
 client = InferenceClient(api_key=deepseek_key)
 
-def ask_deepseek(prompt):
+def ask_deepseek(prompt,history):
     try:
         # We use DeepSeek-V3 (the current stable public version)
         response = client.chat_completion(
             model='deepseek-ai/DeepSeek-V3',
-            messages=[{"role": "user", "content": prompt}],
+            messages=[{"role": "system", "content": f"Your memory is-{history}"},
+                      {"role": "user", "content": prompt}
+                     ],
             max_tokens=500
         )
         return response.choices[0].message.content
@@ -148,12 +154,13 @@ def ask_deepseek(prompt):
         return f"Error: {e}"
 
 #Groq "llama-3.3-70b-versatile"
-def ask_groq(prompt,model):
+def ask_groq(prompt,model,history):
     try:
         client = Groq(api_key=groq_key)
         response = client.chat.completions.create(
             model=model,
             messages=[
+                {"role": "system", "content": f"Your memory is -{history}"},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -161,35 +168,37 @@ def ask_groq(prompt,model):
     except Exception as e:
         return f"Error: {e}"
 
-def ask_qwen(prompt):
+def ask_qwen(prompt,history):
     try:
         client = InferenceClient(api_key=deepseek_key)  # use your HF key
         response = client.chat_completion(
             model="Qwen/Qwen2.5-72B-Instruct",
-            messages=[{"role": "user", "content": prompt}],
+            messages=[{"role": "system", "content": f"Your memory is-{history}"},
+                      {"role": "user", "content": prompt}
+                     ],
             max_tokens=500
         )
         return response.choices[0].message.content
     except Exception as e:
         return f"Error: {e}"
 
-def get_ai_response(ai, ask):
+def get_ai_response(ai, ask,history):
     if ai == 'Gemini':
-        return ask_gemini(ask)
+        return ask_gemini(ask,history)
     elif ai == 'ChatGPT':
-        return ask_ai(ask,'openai/gpt-oss-120b:free','You are ChatGPT an helpful and smart ai assistant.')
+        return ask_ai(ask,'openai/gpt-oss-120b:free','You are ChatGPT an helpful and smart ai assistant.',history)
     elif ai == 'Qwen':
-        return ask_qwen(ask)
+        return ask_qwen(ask,history)
     elif ai == 'Deepseek':
-        return ask_deepseek(ask)
+        return ask_deepseek(ask,history)
     elif ai == 'Meta Ai':
-        return ask_groq(ask,"llama-3.3-70b-versatile")
+        return ask_groq(ask,"llama-3.3-70b-versatile",history)
     elif ai == 'Sarvam':
-        return ask_sarvam(ask)
+        return ask_sarvam(ask,history)
     elif ai == 'Z.ai':
-        return ask_ai(ask,'z-ai/glm-4.5-air:free','You are Z.ai an helpful and smart ai assistant')
+        return ask_ai(ask,'z-ai/glm-4.5-air:free','You are Z.ai an helpful and smart ai assistant',history)
     elif ai == 'Nvidia Nemotron':
-        return ask_ai(ask,'nvidia/nemotron-3-super-120b-a12b:free','You are Nvidia Nemotron an helpful and smart ai assistant.')
+        return ask_ai(ask,'nvidia/nemotron-3-super-120b-a12b:free','You are Nvidia Nemotron an helpful and smart ai assistant.',history)
 
 
 @app.route('/chat/api', methods=['POST'])
@@ -201,7 +210,13 @@ def chat_api():
     data = request.get_json(force=True)
     ai = data.get('aimodel')
     ask = data.get('chat')
-    ans = get_ai_response(ai, ask)
+    history_response = supabase.table('chats')\
+        .select('*')\
+        .eq('user_email', session['user'])\
+        .order('created_at')\
+        .execute()
+    history = history_response.data
+    ans = get_ai_response(ai, ask,history)
     
     #Save to Supabase
     supabase.table('chats').insert({
@@ -228,7 +243,7 @@ def chat():
         ai = request.form.get('aimodel')
         ask1 = request.form.get('chat')
         ask=f'This is the chat history-{history}.Give the answer while remmebring the chat history.And you have to answer this-{ask1}'
-        ans = get_ai_response(ai, ask)
+        ans = get_ai_response(ai, ask,history)
     return render_template('chat.html', ans=ans, history=history)
 
 @app.route('/logout/')
@@ -237,3 +252,4 @@ def logout():
     return render_template('home.html')
 if __name__=="__main__":
     app.run(debug=True, port=400, host='0.0.0.0')
+
