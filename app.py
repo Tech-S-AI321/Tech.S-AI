@@ -27,7 +27,7 @@ deepseek_key:str = os.getenv('Deepseek_KEY')
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY')
-app.permanent_session_lifetime = timedelta(days=90)
+app.permanent_session_lifetime = timedelta(days=365)
 
 @app.route('/')
 def home():
