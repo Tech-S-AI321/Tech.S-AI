@@ -85,7 +85,7 @@ def ask_ai(prompt,model,des,history):
         data = {
             "model": model,
             "messages": [
-                {"role": "system", "content": f'{des}, The memory = {history}'},
+                {"role": "system", "content": f'{des}, The memory = {history}',"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
                 {"role": "user", "content": prompt}
             ]
         }
@@ -110,7 +110,7 @@ def ask_gemini(prompt,history):
             model="gemini-flash-latest",
             contents=prompt,
             config=types.GenerateContentConfig(
-            system_instruction=f"This is your memory={history}."
+            system_instruction=f"This is your memory={history}."You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app.""
             )
         )
         return response.text
@@ -124,7 +124,7 @@ def ask_sarvam(prompt,history):
         response = client.chat.completions(
             model="sarvam-m",
             messages=[
-                {"role": "system", "content": f"You are a helpful AI assistant. Only give the final answer directly. And this is your memory-{history}"},
+                {"role": "system", "content": f"You are a helpful AI assistant. Only give the final answer directly. And this is your memory-{history}."You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app.""},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -144,7 +144,7 @@ def ask_deepseek(prompt,history):
         # We use DeepSeek-V3 (the current stable public version)
         response = client.chat_completion(
             model='deepseek-ai/DeepSeek-V3',
-            messages=[{"role": "system", "content": f"Your memory is-{history}"},
+            messages=[{"role": "system", "content": f"Your memory is-{history}."You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app.""},
                       {"role": "user", "content": prompt}
                      ],
             max_tokens=500
@@ -160,7 +160,7 @@ def ask_groq(prompt,model,history):
         response = client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": f"Your memory is -{history}"},
+                {"role": "system", "content": f"Your memory is -{history}."You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app.""},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -173,7 +173,7 @@ def ask_qwen(prompt,history):
         client = InferenceClient(api_key=deepseek_key)  # use your HF key
         response = client.chat_completion(
             model="Qwen/Qwen2.5-72B-Instruct",
-            messages=[{"role": "system", "content": f"Your memory is-{history}"},
+            messages=[{"role": "system", "content": f"Your memory is-{history}"."You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
                       {"role": "user", "content": prompt}
                      ],
             max_tokens=500
