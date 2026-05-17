@@ -176,7 +176,7 @@ def ask_qwen(prompt):
         client = InferenceClient(api_key=deepseek_key) 
         response = client.chat_completion(
             model="Qwen/Qwen2.5-72B-Instruct",
-            messages=[{"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+            messages=[{"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. And you are created by Alibaba Cloud. "},
                       {"role": "user", "content": prompt}
                      ],
             max_tokens=7000
