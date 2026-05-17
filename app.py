@@ -76,7 +76,7 @@ def login():
     return render_template('login.html',error=error, success=success)
 
 #OPENROUTER:-
-def ask_ai(prompt,model,des,history):
+def ask_ai(prompt,model,des):
     try:
         url = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -88,7 +88,7 @@ def ask_ai(prompt,model,des,history):
         data = {
             "model": model,
             "messages": [
-                {"role": "system", "content": f'{des}, The memory = {history}. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app.'},
+                {"role": "system", "content": f'{des}. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app.'},
                 {"role": "user", "content": prompt}
             ]
         }
@@ -106,14 +106,14 @@ def ask_ai(prompt,model,des,history):
         return f"Sorry sir there is an error.{e}"
 
 #Gemini
-def ask_gemini(prompt,history):
+def ask_gemini(prompt):
     try:
         client = genai.Client(api_key=gemini_key)
         response = client.models.generate_content(
             model="gemini-flash-latest",
             contents=prompt,
             config=types.GenerateContentConfig(
-            system_instruction=f"This is your memory={history}. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."
+            system_instruction=f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."
             )
         )
         return response.text
@@ -142,12 +142,12 @@ def ask_sarvam(prompt):
 #Deepseek 
 client = InferenceClient(api_key=deepseek_key)
 
-def ask_deepseek(prompt,history):
+def ask_deepseek(prompt):
     try:
         # We use DeepSeek-V3 (the current stable public version)
         response = client.chat_completion(
             model='deepseek-ai/DeepSeek-V3',
-            messages=[{"role": "system", "content": f"Your memory is-{history}. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+            messages=[{"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
                       {"role": "user", "content": prompt}
                      ],
             max_tokens=500
@@ -157,13 +157,13 @@ def ask_deepseek(prompt,history):
         return f"Error: {e}"
 
 #Groq "llama-3.3-70b-versatile"
-def ask_groq(prompt,model,history):
+def ask_groq(prompt,model):
     try:
         client = Groq(api_key=groq_key)
         response = client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": f"Your memory is -{history}. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+                {"role": "system", "content": "You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -171,37 +171,37 @@ def ask_groq(prompt,model,history):
     except Exception as e:
         return f"Error: {e}"
 
-def ask_qwen(prompt,history):
+def ask_qwen(prompt):
     try:
-        client = InferenceClient(api_key=deepseek_key)  # use your HF key
+        client = InferenceClient(api_key=deepseek_key) 
         response = client.chat_completion(
             model="Qwen/Qwen2.5-72B-Instruct",
-            messages=[{"role": "system", "content": f"Your memory is-{history}. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+            messages=[{"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
                       {"role": "user", "content": prompt}
                      ],
-            max_tokens=500
+            max_tokens=7000
         )
         return response.choices[0].message.content
     except Exception as e:
         return f"Error: {e}"
 
-def get_ai_response(ai, ask,history):
+def get_ai_response(ai, ask):
     if ai == 'Gemini':
-        return ask_gemini(ask,history)
+        return ask_gemini(ask)
     elif ai == 'ChatGPT':
-        return ask_ai(ask,'openai/gpt-oss-120b:free','You are ChatGPT an helpful and smart ai assistant.',history)
+        return ask_ai(ask,'openai/gpt-oss-120b:free','You are ChatGPT an helpful and smart ai assistant.')
     elif ai == 'Qwen':
-        return ask_qwen(ask,history)
+        return ask_qwen(ask)
     elif ai == 'Deepseek':
-        return ask_deepseek(ask,history)
+        return ask_deepseek(ask)
     elif ai == 'Meta Ai':
-        return ask_groq(ask,"llama-3.3-70b-versatile",history)
+        return ask_groq(ask,"llama-3.3-70b-versatile")
     elif ai == 'Sarvam':
         return ask_sarvam(ask)
     elif ai == 'Z.ai':
-        return ask_ai(ask,'z-ai/glm-4.5-air:free','You are Z.ai an helpful and smart ai assistant',history)
+        return ask_ai(ask,'z-ai/glm-4.5-air:free','You are Z.ai an helpful and smart ai assistant')
     elif ai == 'Nvidia Nemotron':
-        return ask_ai(ask,'nvidia/nemotron-3-super-120b-a12b:free','You are Nvidia Nemotron an helpful and smart ai assistant.',history)
+        return ask_ai(ask,'nvidia/nemotron-3-super-120b-a12b:free','You are Nvidia Nemotron an helpful and smart ai assistant.')
 
 
 @app.route('/chat/api', methods=['POST'])
@@ -246,7 +246,7 @@ def chat():
         ai = request.form.get('aimodel')
         ask = request.form.get('chat')
         #ask=f'This is the chat #history-{history}.Give the answer while #remmebring the chat history.And you have to #answer this-{ask1}'
-        ans = get_ai_response(ai, ask,history)
+        ans = get_ai_response(ai, ask)
     return render_template('chat.html', ans=ans, history=history)
 
 @app.route('/logout/')
