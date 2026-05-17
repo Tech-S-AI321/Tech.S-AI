@@ -90,7 +90,7 @@ def ask_ai(prompt, model, des, max_retries=3):
             headers = {
                 "Authorization": f'Bearer {openrouter_key}',
                 "Content-Type": "application/json",
-                "HTTP-Referer": "http://localhost:400",
+                "HTTP-Referer": "http://tech-s-ai-w1qo.onrender.com",
                 "X-Title": "Tech.S AI"
             }
 
