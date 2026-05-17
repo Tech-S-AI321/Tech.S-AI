@@ -121,13 +121,13 @@ def ask_gemini(prompt,history):
         return f"Error: {e}"
 
 #Sarvam
-def ask_sarvam(prompt,history):
+def ask_sarvam(prompt):
     try:
         client = SarvamAI(api_subscription_key=sarvam_key)
         response = client.chat.completions(
             model="sarvam-m",
             messages=[
-                {"role": "system", "content": f"You are a helpful AI assistant. Only give the final answer directly. And this is your memory-{history}. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+                {"role": "system", "content": f"You are a helpful AI assistant. Only give the final answer directly. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -197,7 +197,7 @@ def get_ai_response(ai, ask,history):
     elif ai == 'Meta Ai':
         return ask_groq(ask,"llama-3.3-70b-versatile",history)
     elif ai == 'Sarvam':
-        return ask_sarvam(ask,history)
+        return ask_sarvam(ask)
     elif ai == 'Z.ai':
         return ask_ai(ask,'z-ai/glm-4.5-air:free','You are Z.ai an helpful and smart ai assistant',history)
     elif ai == 'Nvidia Nemotron':
