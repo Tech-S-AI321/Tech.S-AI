@@ -244,8 +244,8 @@ def chat():
     ans = ''
     if request.method == 'POST':
         ai = request.form.get('aimodel')
-        ask1 = request.form.get('chat')
-        ask=f'This is the chat history-{history}.Give the answer while remmebring the chat history.And you have to answer this-{ask1}'
+        ask = request.form.get('chat')
+        #ask=f'This is the chat #history-{history}.Give the answer while #remmebring the chat history.And you have to #answer this-{ask1}'
         ans = get_ai_response(ai, ask,history)
     return render_template('chat.html', ans=ans, history=history)
 
