@@ -202,7 +202,8 @@ def get_ai_response(ai, ask):
         return ask_ai(ask,'z-ai/glm-4.5-air:free','You are Z.ai an helpful and smart ai assistant')
     elif ai == 'Nvidia Nemotron':
         return ask_ai(ask,'nvidia/nemotron-3-super-120b-a12b:free','You are Nvidia Nemotron an helpful and smart ai assistant.')
-
+    else :
+        return "AI model not found!"
 
 @app.route('/chat/api', methods=['POST'])
 def chat_api():
@@ -219,7 +220,7 @@ def chat_api():
         .order('created_at')\
         .execute()
     history = history_response.data
-    ans = get_ai_response(ai, ask,history)
+    ans = get_ai_response(ai, ask)
     
     #Save to Supabase
     supabase.table('chats').insert({
