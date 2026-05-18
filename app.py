@@ -78,7 +78,7 @@ def login():
     return render_template('login.html',error=error, success=success)
 
 #Gemini
-def ask_gemini(prompt):
+def ask_gemini(prompt,history):
     try:
         client = genai.Client(api_key=gemini_key)
         response = client.models.generate_content(
@@ -93,7 +93,7 @@ def ask_gemini(prompt):
         return f"Error: {e}"
 
 #Sarvam
-def ask_sarvam(prompt):
+def ask_sarvam(prompt,history):
     try:
         client = SarvamAI(api_subscription_key=sarvam_key)
         response = client.chat.completions(
@@ -112,7 +112,7 @@ def ask_sarvam(prompt):
 #Deepseek (Reuse client to avoid recreating)
 deepseek_client = InferenceClient(api_key=deepseek_key)
 
-def ask_deepseek(prompt):
+def ask_deepseek(prompt,history):
     try:
         response = deepseek_client.chat_completion(
             model='deepseek-ai/DeepSeek-V3',
@@ -127,7 +127,7 @@ def ask_deepseek(prompt):
         return f"Error: {e}"
 
 #Groq
-def ask_groq(prompt, model):
+def ask_groq(prompt, model,history):
     try:
         client = Groq(api_key=groq_key)
         response = client.chat.completions.create(
@@ -144,7 +144,7 @@ def ask_groq(prompt, model):
 #Qwen (Reuse client to avoid recreating)
 qwen_client = InferenceClient(api_key=deepseek_key)
 
-def ask_qwen(prompt):
+def ask_qwen(prompt,history):
     try:
         response = qwen_client.chat_completion(
             model="Qwen/Qwen2.5-72B-Instruct",
@@ -157,10 +157,10 @@ def ask_qwen(prompt):
         return response.choices[0].message.content
     except Exception as e:
         return f"Error: {e}"
-#ChatGPT
+'''#ChatGPT
 gptoss_client = InferenceClient(api_key=deepseek_key)
 
-def ask_chatgpt(prompt):
+def ask_chatgpt(prompt,history):
     try:
         response = gptoss_client.chat_completion(
             model="openai/gpt-oss-120b",
@@ -172,7 +172,7 @@ def ask_chatgpt(prompt):
         )
         return response.choices[0].message.content
     except Exception as e:
-        return f"Error: {e}"
+        return f"Error: {e}" '''
 '''#Nvidia
 nemotron_client = InferenceClient(api_key=deepseek_key)
 
@@ -205,20 +205,35 @@ def ask_mistral(prompt):
         return response.choices[0].message.content
     except Exception as e:
         return f"Error: {e}"'''
+#AI for summarizing history.
+def ask_history(history):
+    try:
+        client = InferenceClient(api_key=deepseek_key) 
+        response = client.chat_completion(
+            model="Qwen/Qwen2.5-72B-Instruct",
+            messages=[{"role": "system", "content": f"You will be given a large messy chat history, you have to summarixe that chat history in maximum 1000 words"},
+                      {"role": "user", "content": history}
+                     ],
+            max_tokens=99000
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"Error: {e}"
 
-def get_ai_response(ai, ask):
+
+def get_ai_response(ai, ask,history):
     if ai == 'Gemini':
-        return ask_gemini(ask)
+        return ask_gemini(ask,history)
     elif ai == 'ChatGPT':
-        return ask_chatgpt(ask)
+        return ask_groq(ask,"openai/gpt-oss-120b",history)
     elif ai == 'Qwen':
-        return ask_qwen(ask)
+        return ask_qwen(ask,history)
     elif ai == 'Deepseek':
-        return ask_deepseek(ask)
+        return ask_deepseek(ask,history)
     elif ai == 'Meta Ai':
-        return ask_groq(ask, "llama-3.3-70b-versatile")
+        return ask_groq(ask, "llama-3.3-70b-versatile",history)
     elif ai == 'Sarvam':
-        return ask_sarvam(ask)
+        return ask_sarvam(ask,history)
    # elif ai == 'Mistral':
        # return ask_mistral(ask)
    # elif ai == 'Nvidia Nemotron':
@@ -249,12 +264,13 @@ def chat_api():
                 .order('created_at')\
                 .execute()
             history = history_response.data
+            newhistory=ask_history(history)
         except Exception as e:
             print(f"Error fetching chat history: {e}")
             history = []
         
         # Get AI response
-        ans = get_ai_response(ai, ask)
+        ans = get_ai_response(ai, ask,newhistory)
         
         # Save to Supabase
         try:
@@ -277,23 +293,18 @@ def chat_api():
 def chat():
     if 'user' not in session:
        return redirect(url_for('login'))
-    
-    try:
-        history_response = supabase.table('chats')\
-            .select('*')\
-            .eq('user_email', session['user'])\
-            .order('created_at')\
-            .execute()
-        history = history_response.data
-    except Exception as e:
-        print(f"Error fetching chat history: {e}")
-        history = []
-    
+    history_response = supabase.table('chats')\
+        .select('*')\
+        .eq('user_email', session['user'])\
+        .order('created_at')\
+        .execute()
+    history = history_response.data
+    newhistory=ask_history(history)
     ans = ''
     if request.method == 'POST':
         ai = request.form.get('aimodel')
         ask = request.form.get('chat')
-        ans = get_ai_response(ai, ask)
+        ans = get_ai_response(ai, ask,newhistory)
     
     return render_template('chat.html', ans=ans, history=history)
 
