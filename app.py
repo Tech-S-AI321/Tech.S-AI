@@ -209,7 +209,7 @@ def ask_mistral(prompt):
 #AI for summarizing history.
 def ask_history(history):
     try:
-        client = InferenceClient(api_key=deepseek_key) 
+        client = InferenceClient(api_key=hanu_key) 
         response = client.chat_completion(
             model="Qwen/Qwen2.5-72B-Instruct",
             messages=[{"role": "system", "content": f"You will be given a large messy chat history, you have to summarixe that chat history in maximum 1000 words"},
