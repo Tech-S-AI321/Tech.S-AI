@@ -173,7 +173,7 @@ def ask_chatgpt(prompt):
         return response.choices[0].message.content
     except Exception as e:
         return f"Error: {e}"
-#Nvidia
+'''#Nvidia
 nemotron_client = InferenceClient(api_key=deepseek_key)
 
 def ask_nvidia(prompt):
@@ -204,7 +204,7 @@ def ask_mistral(prompt):
         )
         return response.choices[0].message.content
     except Exception as e:
-        return f"Error: {e}"
+        return f"Error: {e}"'''
 
 def get_ai_response(ai, ask):
     if ai == 'Gemini':
@@ -219,10 +219,10 @@ def get_ai_response(ai, ask):
         return ask_groq(ask, "llama-3.3-70b-versatile")
     elif ai == 'Sarvam':
         return ask_sarvam(ask)
-    elif ai == 'Mistral':
+   ''' elif ai == 'Mistral':
         return ask_mistral(ask)
     elif ai == 'Nvidia Nemotron':
-        return ask_nvidia(ask)
+        return ask_nvidia(ask)'''
     else :
         return "AI model not found!"
 
