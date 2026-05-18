@@ -134,7 +134,7 @@ def ask_groq(prompt, model,history):
         response = client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": "You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. And this is your memory-{history}"},
+                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. And this is your memory-{history}"},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -206,7 +206,7 @@ def ask_mistral(prompt):
         return response.choices[0].message.content
     except Exception as e:
         return f"Error: {e}"'''
-#AI for summarizing history.
+'''#AI for summarizing history.
 def ask_history(history):
     try:
         client = InferenceClient(api_key=hanu_key) 
@@ -219,7 +219,7 @@ def ask_history(history):
         )
         return response.choices[0].message.content
     except Exception as e:
-        return f"Error: {e}"
+        return f"Error: {e}"'''
 
 
 def get_ai_response(ai, ask,history):
@@ -265,7 +265,7 @@ def chat_api():
                 .order('created_at')\
                 .execute()
             history = history_response.data
-            newhistory=ask_history(history)
+            new_history=history[-15:] if history else []
         except Exception as e:
             print(f"Error fetching chat history: {e}")
             history = []
@@ -300,7 +300,7 @@ def chat():
         .order('created_at')\
         .execute()
     history = history_response.data
-    newhistory=ask_history(history)
+    newhistory=history[-15:] if history else []
     ans = ''
     if request.method == 'POST':
         ai = request.form.get('aimodel')
