@@ -77,125 +77,6 @@ def login():
             error = "Login failed. Please check your email and password."
     return render_template('login.html',error=error, success=success)
 
-#OPENROUTER with Retry Logic
-def ask_ai(prompt, model, des, max_retries=3):
-    """
-    Call OpenRouter API with retry logic for free models.
-    Free models are rate-limited, so retries help with intermittent failures.
-    """
-    for attempt in range(max_retries):
-        try:
-            url = "https://openrouter.ai/api/v1/chat/completions"
-
-            headers = {
-                "Authorization": f'Bearer {openrouter_key}',
-                "Content-Type": "application/json",
-                "HTTP-Referer": "http://tech-s-ai-w1qo.onrender.com",
-                "X-Title": "Tech.S AI"
-            }
-
-            data = {
-                "model": model,
-                "messages": [
-                    {"role": "system", "content": f'{des}. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app.'},
-                    {"role": "user", "content": prompt}
-                ],
-                "temperature": 0.7,
-                "max_tokens": 1000
-            }
-
-            # Add timeout to prevent hanging (increased to 45s for free models)
-            response = requests.post(url, headers=headers, json=data, timeout=45)
-            
-            print(f"[Attempt {attempt + 1}/{max_retries}] OpenRouter Status: {response.status_code}")
-
-            # Rate limited - wait and retry
-            if response.status_code == 429:
-                wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s
-                print(f"Rate limited. Waiting {wait_time}s before retry...")
-                if attempt < max_retries - 1:
-                    time.sleep(wait_time)
-                    continue
-                else:
-                    return "OpenRouter is currently rate limited. Please try again in a few moments."
-
-            # Authentication error
-            if response.status_code == 401:
-                return "OpenRouter authentication failed. Check your API key in key.env"
-
-            # Server error - retry
-            if response.status_code >= 500:
-                wait_time = 2 ** attempt
-                print(f"Server error {response.status_code}. Waiting {wait_time}s before retry...")
-                if attempt < max_retries - 1:
-                    time.sleep(wait_time)
-                    continue
-                else:
-                    return f"OpenRouter server error {response.status_code}. Please try again later."
-
-            # Other HTTP errors
-            if response.status_code != 200:
-                print(f"OpenRouter Error {response.status_code}: {response.text}")
-                return f"OpenRouter error {response.status_code}"
-
-            # Parse response
-            try:
-                result = response.json()
-            except Exception as e:
-                print(f"JSON Parse Error: {e}")
-                if attempt < max_retries - 1:
-                    time.sleep(2 ** attempt)
-                    continue
-                return "Invalid response format from OpenRouter"
-
-            # Validate response structure
-            if 'choices' not in result or not result['choices']:
-                print(f"No choices in response: {result}")
-                if attempt < max_retries - 1:
-                    time.sleep(2 ** attempt)
-                    continue
-                return "OpenRouter returned no response choices"
-
-            if 'message' not in result['choices'][0]:
-                print(f"No message in choices: {result}")
-                if attempt < max_retries - 1:
-                    time.sleep(2 ** attempt)
-                    continue
-                return "OpenRouter returned no message content"
-
-            # Success!
-            return result['choices'][0]['message']['content']
-
-        except requests.exceptions.Timeout:
-            print(f"Timeout on attempt {attempt + 1}")
-            if attempt < max_retries - 1:
-                wait_time = 2 ** attempt
-                print(f"Waiting {wait_time}s before retry...")
-                time.sleep(wait_time)
-                continue
-            else:
-                return "Request timed out. The model is taking too long to respond."
-
-        except requests.exceptions.ConnectionError as e:
-            print(f"Connection error on attempt {attempt + 1}: {e}")
-            if attempt < max_retries - 1:
-                wait_time = 2 ** attempt
-                print(f"Waiting {wait_time}s before retry...")
-                time.sleep(wait_time)
-                continue
-            else:
-                return "Connection error with OpenRouter. Check your internet."
-
-        except Exception as e:
-            print(f"Unexpected error on attempt {attempt + 1}: {e}")
-            if attempt < max_retries - 1:
-                time.sleep(2 ** attempt)
-                continue
-            else:
-                return f"Unexpected error: {str(e)}"
-
-    return "Failed to get response from OpenRouter after multiple attempts."
-
 #Gemini
 def ask_gemini(prompt):
     try:
@@ -239,7 +120,7 @@ def ask_deepseek(prompt):
                 {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=500
+            max_tokens=7000
         )
         return response.choices[0].message.content
     except Exception as e:
@@ -276,12 +157,60 @@ def ask_qwen(prompt):
         return response.choices[0].message.content
     except Exception as e:
         return f"Error: {e}"
+#ChatGPT
+gptoss_client = InferenceClient(api_key=deepseek_key)
+
+def ask_chatgpt(prompt):
+    try:
+        response = gptoss_client.chat_completion(
+            model="openai/gpt-oss-120b",
+            messages=[
+                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=7000
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"Error: {e}"
+#Nvidia
+nemotron_client = InferenceClient(api_key=deepseek_key)
+
+def ask_nvidia(prompt):
+    try:
+        response = nemotron_client.chat_completion(
+            model="nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16",
+            messages=[
+                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=7000
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"Error: {e}"
+#Mistral
+mistral_client = InferenceClient(api_key=deepseek_key)
+
+def ask_mistral(prompt):
+    try:
+        response = mistral_client.chat_completion(
+            model="mistralai/Mistral-Medium-3.5-128B",
+            messages=[
+                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=7000
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"Error: {e}"
 
 def get_ai_response(ai, ask):
     if ai == 'Gemini':
         return ask_gemini(ask)
     elif ai == 'ChatGPT':
-        return ask_ai(ask, 'openai/gpt-oss-120b:free', 'You are ChatGPT an helpful and smart ai assistant.')
+        return ask_chatgpt(ask)
     elif ai == 'Qwen':
         return ask_qwen(ask)
     elif ai == 'Deepseek':
@@ -290,10 +219,10 @@ def get_ai_response(ai, ask):
         return ask_groq(ask, "llama-3.3-70b-versatile")
     elif ai == 'Sarvam':
         return ask_sarvam(ask)
-    elif ai == 'Z.ai':
-        return ask_ai(ask, 'z-ai/glm-4.5-air:free', 'You are Z.ai an helpful and smart ai assistant')
+    elif ai == 'Mistral':
+        return ask_mistral(ask)
     elif ai == 'Nvidia Nemotron':
-        return ask_ai(ask, 'nvidia/nemotron-3-super-120b-a12b:free', 'You are Nvidia Nemotron an helpful and smart ai assistant.')
+        return ask_nvidia(ask)
     else :
         return "AI model not found!"
 
