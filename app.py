@@ -25,6 +25,7 @@ gemini_key = os.getenv("GEMINI_KEY")
 sarvam_key = os.getenv("SARVAMAI_KEY")
 groq_key = os.getenv("GROQ_KEY")
 deepseek_key:str = os.getenv('Deepseek_KEY')
+hanu_key:str = os.getenv('hanu_key')
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY')
@@ -110,7 +111,7 @@ def ask_sarvam(prompt,history):
         return f"Error: {e}"
 
 #Deepseek (Reuse client to avoid recreating)
-deepseek_client = InferenceClient(api_key=deepseek_key)
+deepseek_client = InferenceClient(api_key=hanu_key)
 
 def ask_deepseek(prompt,history):
     try:
@@ -142,7 +143,7 @@ def ask_groq(prompt, model,history):
         return f"Error: {e}"
 
 #Qwen (Reuse client to avoid recreating)
-qwen_client = InferenceClient(api_key=deepseek_key)
+qwen_client = InferenceClient(api_key=hanu_key)
 
 def ask_qwen(prompt,history):
     try:
@@ -157,8 +158,8 @@ def ask_qwen(prompt,history):
         return response.choices[0].message.content
     except Exception as e:
         return f"Error: {e}"
-'''#ChatGPT
-gptoss_client = InferenceClient(api_key=deepseek_key)
+#ChatGPT
+gptoss_client = InferenceClient(api_key=hanu_key)
 
 def ask_chatgpt(prompt,history):
     try:
@@ -172,7 +173,7 @@ def ask_chatgpt(prompt,history):
         )
         return response.choices[0].message.content
     except Exception as e:
-        return f"Error: {e}" '''
+        return f"Error: {e}" 
 '''#Nvidia
 nemotron_client = InferenceClient(api_key=deepseek_key)
 
@@ -225,7 +226,7 @@ def get_ai_response(ai, ask,history):
     if ai == 'Gemini':
         return ask_gemini(ask,history)
     elif ai == 'ChatGPT':
-        return ask_groq(ask,"openai/gpt-oss-120b",history)
+        return ask_chatgpt(ask,history)
     elif ai == 'Qwen':
         return ask_qwen(ask,history)
     elif ai == 'Deepseek':
