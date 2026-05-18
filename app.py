@@ -219,10 +219,10 @@ def get_ai_response(ai, ask):
         return ask_groq(ask, "llama-3.3-70b-versatile")
     elif ai == 'Sarvam':
         return ask_sarvam(ask)
-   ''' elif ai == 'Mistral':
-        return ask_mistral(ask)
-    elif ai == 'Nvidia Nemotron':
-        return ask_nvidia(ask)'''
+   # elif ai == 'Mistral':
+       # return ask_mistral(ask)
+   # elif ai == 'Nvidia Nemotron':
+        #return ask_nvidia(ask)
     else :
         return "AI model not found!"
 
