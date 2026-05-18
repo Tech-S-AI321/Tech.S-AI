@@ -100,8 +100,7 @@ def ask_sarvam(prompt):
         response = client.chat.completions(
             model="sarvam-m",
             messages=[
-                {"role": "system", "content": f"You are a helpful AI assistant. Only give the final answer directly. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
-                {"role": "user", "content": prompt}
+                {"role": "system", "content": f"You are a helpful AI assistant. Only give the final answer directly. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},                {"role": "user", "content": prompt}
             ]
         )
         answer = response.choices[0].message.content
@@ -113,7 +112,7 @@ def ask_sarvam(prompt):
 #Deepseek (Reuse client to avoid recreating)
 deepseek_client = InferenceClient(api_key=hanu_key)
 
-def ask_deepseek(prompt,history):
+def ask_deepseek(prompt):
     try:
         response = deepseek_client.chat_completion(
             model='deepseek-ai/DeepSeek-V3',
@@ -128,7 +127,7 @@ def ask_deepseek(prompt,history):
         return f"Error: {e}"
 
 #Groq
-def ask_groq(prompt, model,history):
+def ask_groq(prompt, model):
     try:
         client = Groq(api_key=groq_key)
         response = client.chat.completions.create(
@@ -145,7 +144,7 @@ def ask_groq(prompt, model,history):
 #Qwen (Reuse client to avoid recreating)
 qwen_client = InferenceClient(api_key=hanu_key)
 
-def ask_qwen(prompt,history):
+def ask_qwen(prompt):
     try:
         response = qwen_client.chat_completion(
             model="Qwen/Qwen2.5-72B-Instruct",
@@ -161,7 +160,7 @@ def ask_qwen(prompt,history):
 #ChatGPT
 gptoss_client = InferenceClient(api_key=hanu_key)
 
-def ask_chatgpt(prompt,history):
+def ask_chatgpt(prompt):
     try:
         response = gptoss_client.chat_completion(
             model="openai/gpt-oss-120b",
@@ -302,7 +301,7 @@ def chat():
     if request.method == 'POST':
         ai = request.form.get('aimodel')
         ask = request.form.get('chat')
-        ans = get_ai_response(ai, ask,newhistory)
+        ans = get_ai_response(ai, ask)
     
     return render_template('chat.html', ans=ans, history=history)
 
