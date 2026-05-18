@@ -86,7 +86,7 @@ def ask_gemini(prompt,history):
             model="gemini-flash-latest",
             contents=prompt,
             config=types.GenerateContentConfig(
-            system_instruction=f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."
+            system_instruction=f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app.And this is your memory-{history}"
             )
         )
         return response.text
@@ -100,7 +100,7 @@ def ask_sarvam(prompt,history):
         response = client.chat.completions(
             model="sarvam-m",
             messages=[
-                {"role": "system", "content": f"You are a helpful AI assistant. Only give the final answer directly. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+                {"role": "system", "content": f"You are a helpful AI assistant. Only give the final answer directly. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. And this is your memory-{history}"},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -118,7 +118,7 @@ def ask_deepseek(prompt,history):
         response = deepseek_client.chat_completion(
             model='deepseek-ai/DeepSeek-V3',
             messages=[
-                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. And this is your memory-{history}"},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
@@ -134,7 +134,7 @@ def ask_groq(prompt, model,history):
         response = client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": "You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+                {"role": "system", "content": "You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. And this is your memory-{history}"},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -150,7 +150,7 @@ def ask_qwen(prompt,history):
         response = qwen_client.chat_completion(
             model="Qwen/Qwen2.5-72B-Instruct",
             messages=[
-                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. And this is your memory-{history}"},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
@@ -166,7 +166,7 @@ def ask_chatgpt(prompt,history):
         response = gptoss_client.chat_completion(
             model="openai/gpt-oss-120b",
             messages=[
-                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. And this is your memory-{history}"},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
@@ -212,7 +212,7 @@ def ask_history(history):
         client = InferenceClient(api_key=hanu_key) 
         response = client.chat_completion(
             model="Qwen/Qwen2.5-72B-Instruct",
-            messages=[{"role": "system", "content": f"You will be given a large messy chat history, you have to summarixe that chat history in maximum 1000 words"},
+            messages=[{"role": "system", "content": f"You will be given a large messy chat history, you have to summarixe that chat history in maximum 1000 words, and directly write the last 5 chats."},
                       {"role": "user", "content": history}
                      ],
             max_tokens=99000
