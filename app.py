@@ -79,14 +79,14 @@ def login():
     return render_template('login.html',error=error, success=success)
 
 #Gemini
-def ask_gemini(prompt,history):
+def ask_gemini(prompt):
     try:
         client = genai.Client(api_key=gemini_key)
         response = client.models.generate_content(
             model="gemini-flash-latest",
             contents=prompt,
             config=types.GenerateContentConfig(
-            system_instruction=f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app.And this is your memory-{history}"
+            system_instruction=f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."
             )
         )
         return response.text
@@ -94,13 +94,13 @@ def ask_gemini(prompt,history):
         return f"Error: {e}"
 
 #Sarvam
-def ask_sarvam(prompt,history):
+def ask_sarvam(prompt):
     try:
         client = SarvamAI(api_subscription_key=sarvam_key)
         response = client.chat.completions(
             model="sarvam-m",
             messages=[
-                {"role": "system", "content": f"You are a helpful AI assistant. Only give the final answer directly. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. And this is your memory-{history}"},
+                {"role": "system", "content": f"You are a helpful AI assistant. Only give the final answer directly. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -118,7 +118,7 @@ def ask_deepseek(prompt,history):
         response = deepseek_client.chat_completion(
             model='deepseek-ai/DeepSeek-V3',
             messages=[
-                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. And this is your memory-{history}"},
+                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
@@ -134,7 +134,7 @@ def ask_groq(prompt, model,history):
         response = client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. And this is your memory-{history}"},
+                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -150,7 +150,7 @@ def ask_qwen(prompt,history):
         response = qwen_client.chat_completion(
             model="Qwen/Qwen2.5-72B-Instruct",
             messages=[
-                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. And this is your memory-{history}"},
+                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
@@ -166,7 +166,7 @@ def ask_chatgpt(prompt,history):
         response = gptoss_client.chat_completion(
             model="openai/gpt-oss-120b",
             messages=[
-                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. And this is your memory-{history}"},
+                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. "},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
@@ -222,19 +222,19 @@ def ask_history(history):
         return f"Error: {e}"'''
 
 
-def get_ai_response(ai, ask,history):
+def get_ai_response(ai, ask):
     if ai == 'Gemini':
-        return ask_gemini(ask,history)
+        return ask_gemini(ask)
     elif ai == 'ChatGPT':
-        return ask_chatgpt(ask,history)
+        return ask_chatgpt(ask)
     elif ai == 'Qwen':
-        return ask_qwen(ask,history)
+        return ask_qwen(ask)
     elif ai == 'Deepseek':
-        return ask_deepseek(ask,history)
+        return ask_deepseek(ask)
     elif ai == 'Meta Ai':
-        return ask_groq(ask, "llama-3.3-70b-versatile",history)
+        return ask_groq(ask, "llama-3.3-70b-versatile")
     elif ai == 'Sarvam':
-        return ask_sarvam(ask,history)
+        return ask_sarvam(ask)
    # elif ai == 'Mistral':
        # return ask_mistral(ask)
    # elif ai == 'Nvidia Nemotron':
@@ -265,13 +265,11 @@ def chat_api():
                 .order('created_at')\
                 .execute()
             history = history_response.data
-            new_history=history[-15:] if history else []
         except Exception as e:
             print(f"Error fetching chat history: {e}")
-            history = []
         
         # Get AI response
-        ans = get_ai_response(ai, ask,newhistory)
+        ans = get_ai_response(ai, ask)
         
         # Save to Supabase
         try:
@@ -300,7 +298,6 @@ def chat():
         .order('created_at')\
         .execute()
     history = history_response.data
-    newhistory=history[-15:] if history else []
     ans = ''
     if request.method == 'POST':
         ai = request.form.get('aimodel')
