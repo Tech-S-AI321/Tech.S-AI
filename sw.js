@@ -17,7 +17,7 @@ const ASSETS = [
   '/static/nvidia.png',
   '/static/qwen.png',
   '/static/sarvam.png',
-  '/static/Zai.png'
+  '/static/Mistral.png'
 ];
 
 // Install Service Worker and cache assets
