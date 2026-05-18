@@ -179,7 +179,7 @@ nemotron_client = InferenceClient(api_key=deepseek_key)
 def ask_nvidia(prompt):
     try:
         response = nemotron_client.chat_completion(
-            model="nvidia/Nemotron-3-Nano-Omni-30B-A3B-Reasoning-BF16",
+            model="nvidia/NVIDIA-Nemotron-3-Nano-4B-BF16",
             messages=[
                 {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
                 {"role": "user", "content": prompt}
@@ -195,7 +195,7 @@ mistral_client = InferenceClient(api_key=deepseek_key)
 def ask_mistral(prompt):
     try:
         response = mistral_client.chat_completion(
-            model="mistralai/Mistral-Medium-3.5-128B",
+            model="mistralai/Mistral-Large-3-675B-Instruct-2512",
             messages=[
                 {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
                 {"role": "user", "content": prompt}
