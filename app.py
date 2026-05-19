@@ -43,11 +43,11 @@ def serve_icon():
 
 @app.route('/manifest.json')
 def manifest():
-    return send_file('manifest.json')
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'manifest.json')
 
 @app.route('/sw.js')
 def service_worker():
-    return send_file('sw.js')
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'sw.js')
 
 @app.route('/signup/',methods=['GET','POST'])
 def signup():
