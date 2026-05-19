@@ -12,6 +12,7 @@ import os
 from huggingface_hub import InferenceClient
 from datetime import timedelta
 import time
+from flask import send_file
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), 'key.env'))
 
@@ -38,6 +39,15 @@ def home():
 @app.route('/icon.png')
 def serve_icon():
     return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'icon.png')
+
+
+@app.route('/manifest.json')
+def manifest():
+    return send_file('manifest.json')
+
+@app.route('/sw.js')
+def service_worker():
+    return send_file('sw.js')
 
 @app.route('/signup/',methods=['GET','POST'])
 def signup():
