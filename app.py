@@ -93,7 +93,7 @@ def ask_gemini(prompt):
     try:
         client = genai.Client(api_key=gemini_key)
         response = client.models.generate_content(
-            model="gemini-flash-latest",
+            model="gemini-2.0-flash",
             contents=prompt,
             config=types.GenerateContentConfig(
             system_instruction=f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."
