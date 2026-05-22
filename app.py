@@ -30,7 +30,7 @@ hanu_key:str = os.getenv('hanu_key')
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY')
-app.permanent_session_lifetime = timedelta(days=365)
+app.permanent_session_lifetime = timedelta(days=90)
 
 @app.route('/')
 def home():
@@ -327,6 +327,10 @@ def chat():
 
 @app.route('/logout/')
 def logout():
+    try:
+        supabase.auth.sign_out() # Wipes the Supabase authentication tokens
+    except Exception as e:
+        print(f"Supabase sign out error: {e}")
     session.clear()
     return render_template('home.html')
 
