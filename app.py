@@ -93,7 +93,7 @@ def ask_gemini(prompt):
     try:
         client = genai.Client(api_key=gemini_key)
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.5-flash",
             contents=prompt,
             config=types.GenerateContentConfig(
             system_instruction=f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."
@@ -101,7 +101,17 @@ def ask_gemini(prompt):
         )
         return response.text
     except Exception as e:
-        return f"Error: {e}"
+        try:
+            response = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+            system_instruction=f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."
+            )
+            )
+            return response.text
+        except Exception as e:
+            return f"Error: {e}"
 
 #Sarvam
 def ask_sarvam(prompt):
