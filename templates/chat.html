@@ -23,7 +23,11 @@
             <li><a href="/">Home</a></li>
             <li><a href="#chat">Chat</a></li>
             <li><a href="#about">About</a></li>
-            <li><a href="{{ url_for('logout') }}" onclick="localStorage.clear(); sessionStorage.clear();">Logout</a></li>
+            <li>
+               <a href="#" onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='{{ url_for('logout') }}'; return false;">
+               Logout
+               </a>
+             </li>
         </ul>
         <button class="hamburger" id="hamburger">
             <i class="fas fa-bars"></i>
