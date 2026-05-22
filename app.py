@@ -1,4 +1,4 @@
-from flask import Flask,request,render_template,url_for,redirect,jsonify,session,send_from_directory
+from flask import Flask,request,render_template,url_for,redirect,jsonify,session,send_from_directory,make_response
 import requests
 from google import genai
 from google.genai import types
