@@ -327,12 +327,12 @@ def chat():
 
 @app.route('/logout/')
 def logout():
-    try:
-        supabase.auth.sign_out() # Wipes the Supabase authentication tokens
-    except Exception as e:
-        print(f"Supabase sign out error: {e}")
-    session.clear()
-    return render_template('home.html')
-
+    session.clear() # Clear Flask server-side session
+    
+    response = make_response(redirect(url_for('login')))
+    # Force browser to clear any cache for this request
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    return response
 if __name__=="__main__":
     app.run(debug=True, port=400, host='0.0.0.0')
