@@ -5,6 +5,7 @@ const ASSETS = [
   '/static/js/main.js',
   '/manifest.json',
   '/icon.png',
+  '/icon2.png',
   '/static/favicon.ico',
   '/static/chatgpt.png',
   '/static/deepseek.png',
