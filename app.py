@@ -34,6 +34,8 @@ app.permanent_session_lifetime = timedelta(days=90)
 
 @app.route('/')
 def home():
+    if 'user' in session:
+        return redirect(url_for('chat')) 
     return render_template('home.html')
     
 @app.route('/icon.png')
