@@ -2,7 +2,9 @@ const CACHE_NAME = 'techsai-cache-v3'; // Bumped version to force cache update
 const ASSETS = [
   // ONLY cache static assets that never change based on login state
   '/static/css/styles.css',
+  '/static/css/chat.css',
   '/static/js/main.js',
+  '/static/js/chat.js',
   '/manifest.json',
   '/icon.png',
   '/icon2.png',
