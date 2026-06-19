@@ -68,11 +68,11 @@
         </div>
 
         <div class="sidebar-bottom">
-            <a href="{{ url_for('home') }}" class="sidebar-action">
+            <a href="/" class="sidebar-action">
                 <i class="fas fa-home"></i>
                 <span>Home</span>
             </a>
-            <a href="#" class="sidebar-action" onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='{{ url_for('logout') }}'; return false;">
+            <a href="#" class="sidebar-action" onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='/logout'; return false;">
                 <i class="fas fa-right-from-bracket"></i>
                 <span>Log out</span>
             </a>
