@@ -13,6 +13,7 @@ from huggingface_hub import InferenceClient
 from datetime import timedelta
 import time
 from flask import send_file
+from ddgs import DDGS
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), 'key.env'))
 
@@ -31,6 +32,11 @@ hanu_key:str = os.getenv('hanu_key')
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY')
 app.permanent_session_lifetime = timedelta(days=90)
+
+def internet(prompt):
+    with DDGS() as ddgs:
+        results = list(ddgs.text(prompt, max_results=5))
+    return results
 
 @app.route('/')
 def home():
@@ -98,7 +104,7 @@ def ask_gemini(prompt):
             model="gemini-3.5-flash",
             contents=prompt,
             config=types.GenerateContentConfig(
-            system_instruction=f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."
+            system_instruction=f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."
             )
         )
         return response.text
@@ -108,7 +114,7 @@ def ask_gemini(prompt):
             model="gemini-2.5-flash-lite",
             contents=prompt,
             config=types.GenerateContentConfig(
-            system_instruction=f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."
+            system_instruction=f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."
             )
             )
             return response.text
@@ -122,7 +128,7 @@ def ask_sarvam(prompt):
         response = client.chat.completions(
             model="sarvam-m",
             messages=[
-                {"role": "system", "content": f"You are a helpful AI assistant. Only give the final answer directly. You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},                {"role": "user", "content": prompt}
+                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."},                {"role": "user", "content": prompt}
             ]
         )
         answer = response.choices[0].message.content
@@ -139,7 +145,7 @@ def ask_deepseek(prompt):
         response = deepseek_client.chat_completion(
             model='deepseek-ai/DeepSeek-V3',
             messages=[
-                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
@@ -149,13 +155,13 @@ def ask_deepseek(prompt):
         return f"Error: {e}"
 
 #Groq
-def ask_groq(prompt, model):
+def ask_groq(prompt):
     try:
         client = Groq(api_key=groq_key)
         response = client.chat.completions.create(
-            model=model,
+            model="llama-3.3-70b-versatile",
             messages=[
-                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -171,7 +177,7 @@ def ask_qwen(prompt):
         response = qwen_client.chat_completion(
             model="Qwen/Qwen2.5-72B-Instruct",
             messages=[
-                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
+                {"role": "system", "content":f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
@@ -182,12 +188,12 @@ def ask_qwen(prompt):
 #ChatGPT
 gptoss_client = InferenceClient(api_key=hanu_key)
 
-def ask_chatgpt(prompt):
+def ask_chatgpt(prompt,ai1,ai2,ai3,ai4,ai5,internet,history):
     try:
         response = gptoss_client.chat_completion(
             model="openai/gpt-oss-120b",
             messages=[
-                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app. "},
+                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments from these 5 ai responses-{ai1} ,{ai2} ,{ai3} ,{ai4} ,{ai5}.You have to make a report by mixixng the best ai responses and add you own knowledge also like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed.You can also use internet search results-{internet}"},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
@@ -195,73 +201,15 @@ def ask_chatgpt(prompt):
         return response.choices[0].message.content
     except Exception as e:
         return f"Error: {e}" 
-'''#Nvidia
-nemotron_client = InferenceClient(api_key=deepseek_key)
 
-def ask_nvidia(prompt):
-    try:
-        response = nemotron_client.chat_completion(
-            model="nvidia/Llama-3.1-Nemotron-70B-Instruct",
-            messages=[
-                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=7000
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"Error: {e}"
-#Mistral
-mistral_client = InferenceClient(api_key=deepseek_key)
-
-def ask_mistral(prompt):
-    try:
-        response = mistral_client.chat_completion(
-            model="mistralai/Mistral-Large-Instruct-2411",
-            messages=[
-                {"role": "system", "content": f"You are working on Tech.S AI platform, its founder is Srijan Mishra(CEO/Scientist), and he is only 12 years old, he integrated you in this Tech.S AI app."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=7000
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"Error: {e}"'''
-'''#AI for summarizing history.
-def ask_history(history):
-    try:
-        client = InferenceClient(api_key=hanu_key) 
-        response = client.chat_completion(
-            model="Qwen/Qwen2.5-72B-Instruct",
-            messages=[{"role": "system", "content": f"You will be given a large messy chat history, you have to summarixe that chat history in maximum 1000 words, and directly write the last 5 chats."},
-                      {"role": "user", "content": history}
-                     ],
-            max_tokens=99000
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"Error: {e}"'''
-
-
-def get_ai_response(ai, ask):
-    if ai == 'Gemini':
-        return ask_gemini(ask)
-    elif ai == 'ChatGPT':
-        return ask_chatgpt(ask)
-    elif ai == 'Qwen':
-        return ask_qwen(ask)
-    elif ai == 'Deepseek':
-        return ask_deepseek(ask)
-    elif ai == 'Meta Ai':
-        return ask_groq(ask, "llama-3.3-70b-versatile")
-    elif ai == 'Sarvam':
-        return ask_sarvam(ask)
-   # elif ai == 'Mistral':
-       # return ask_mistral(ask)
-   # elif ai == 'Nvidia Nemotron':
-        #return ask_nvidia(ask)
-    else :
-        return "AI model not found!"
+def get_ai_response(ask,history):
+    ai1 = ask_gemini(ask)
+    ai2 = ask_sarvam(ask)
+    ai3 = ask_deepseek(ask)
+    ai4 = ask_groq(ask)
+    ai5 = ask_qwen(ask)
+    resp = ask_chatgpt(ask,ai1,ai2,ai3,ai4,ai5,internet(ask),history)
+    return resp
 
 @app.route('/chat/api', methods=['POST'])
 def chat_api():
@@ -271,32 +219,26 @@ def chat_api():
     
     try:
         data = request.get_json(force=True)
-        ai = data.get('aimodel')
         ask = data.get('chat')
-        
-        # Validate input
-        if not ai or not ask:
-            return jsonify({'error': 'Missing aimodel or chat parameter'}), 400
         
         # Get chat history
         try:
             history_response = supabase.table('chats')\
                 .select('*')\
                 .eq('user_email', session['user'])\
-                .order('created_at')\
+                .order('created_at', desc=True)\
                 .execute()
             history = history_response.data
         except Exception as e:
             print(f"Error fetching chat history: {e}")
         
         # Get AI response
-        ans = get_ai_response(ai, ask)
+        ans = get_ai_response(ask,history)
         
         # Save to Supabase
         try:
             supabase.table('chats').insert({
                 'user_email': session['user'],
-                'ai_model': ai,
                 'question': ask,
                 'answer': ans
             }).execute()
@@ -316,14 +258,13 @@ def chat():
     history_response = supabase.table('chats')\
         .select('*')\
         .eq('user_email', session['user'])\
-        .order('created_at')\
+        .order('created_at', desc=True)\
         .execute()
     history = history_response.data
     ans = ''
     if request.method == 'POST':
-        ai = request.form.get('aimodel')
         ask = request.form.get('chat')
-        ans = get_ai_response(ai, ask)
+        ans = get_ai_response(ask,history)
     
     return render_template('chat.html', ans=ans, history=history)
 
@@ -337,4 +278,5 @@ def logout():
     response.headers['Pragma'] = 'no-cache'
     return response
 if __name__=="__main__":
-    app.run(debug=True, port=400, host='0.0.0.0')
+    app.run(debug=True, port=5000, host='0.0.0.0')
+
