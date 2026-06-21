@@ -183,7 +183,7 @@ def ask_qwen(prompt):
 #ChatGPT
 gptoss_client = InferenceClient(api_key=hanu_key)
 
-def ask_chatgpt(prompt,ai1,ai2,ai3,ai4,ai5,history):
+def ask_chatgpt(prompt,ai1,ai2,ai3,ai4,ai5):
     try:
         response = gptoss_client.chat_completion(
             model="openai/gpt-oss-120b",
@@ -198,13 +198,13 @@ def ask_chatgpt(prompt,ai1,ai2,ai3,ai4,ai5,history):
     except Exception as e:
         return f"Error: {e}" 
 
-def get_ai_response(ask,history):
+def get_ai_response(ask):
     ai1 = "skipped"
     ai2 = "skipped"
     ai3 = "skipped"
     ai4 = "skipped"
-    ai5 = "skipped"
-    resp = ask_chatgpt(ask,ai1,ai2,ai3,ai4,ai5, history)
+    ai5 = ask_qwen(ask)
+    resp = ask_chatgpt(ask,ai1,ai2,ai3,ai4,ai5)
     return resp
 
 @app.route('/chat/api', methods=['POST'])
@@ -229,7 +229,7 @@ def chat_api():
             print(f"Error fetching chat history: {e}")
         
         # Get AI response
-        ans = get_ai_response(ask,history)
+        ans = get_ai_response(ask)
         
         # Save to Supabase
         try:
@@ -260,7 +260,7 @@ def chat():
     ans = ''
     if request.method == 'POST':
         ask = request.form.get('chat')
-        ans = get_ai_response(ask,history)
+        ans = get_ai_response(ask)
     
     return render_template('chat.html', ans=ans, history=history)
 
