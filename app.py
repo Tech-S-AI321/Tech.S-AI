@@ -188,7 +188,7 @@ def ask_chatgpt(prompt,ai1,ai2,ai3,ai4,ai5):
         response = gptoss_client.chat_completion(
             model="openai/gpt-oss-120b",
             messages=[
-                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments from these 5 ai responses-{ai1} ,{ai2} ,{ai3} ,{ai4} ,{ai5}.You have to make a report by mixixng the best ai responses and add you own knowledge also like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed.And here is the user's history-{history}"},
+                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments from these 5 ai responses-{ai1} ,{ai2} ,{ai3} ,{ai4} ,{ai5}.You have to make a report by mixixng the best ai responses and add you own knowledge also like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
