@@ -203,7 +203,7 @@ def get_ai_response(ask):
     ai2 = "skipped"
     ai3 = "skipped"
     ai4 = "skipped"
-    ai5 = ask_qwen(ask)
+    ai5 = "skipped"
     resp = ask_chatgpt(ask,ai1,ai2,ai3,ai4,ai5)
     return resp
 
