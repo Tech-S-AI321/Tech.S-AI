@@ -13,7 +13,6 @@ from huggingface_hub import InferenceClient
 from datetime import timedelta
 import time
 from flask import send_file
-from ddgs import DDGS
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), 'key.env'))
 
@@ -33,10 +32,6 @@ app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY')
 app.permanent_session_lifetime = timedelta(days=90)
 
-def internet(prompt):
-    with DDGS() as ddgs:
-        results = list(ddgs.text(prompt, max_results=5))
-    return results
 
 @app.route('/')
 def home():
@@ -188,12 +183,12 @@ def ask_qwen(prompt):
 #ChatGPT
 gptoss_client = InferenceClient(api_key=hanu_key)
 
-def ask_chatgpt(prompt,ai1,ai2,ai3,ai4,ai5,internet,history):
+def ask_chatgpt(prompt,ai1,ai2,ai3,ai4,ai5,history):
     try:
         response = gptoss_client.chat_completion(
             model="openai/gpt-oss-120b",
             messages=[
-                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments from these 5 ai responses-{ai1} ,{ai2} ,{ai3} ,{ai4} ,{ai5}.You have to make a report by mixixng the best ai responses and add you own knowledge also like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed.You can also use internet search results-{internet}"},
+                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments from these 5 ai responses-{ai1} ,{ai2} ,{ai3} ,{ai4} ,{ai5}.You have to make a report by mixixng the best ai responses and add you own knowledge also like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
@@ -208,7 +203,7 @@ def get_ai_response(ask,history):
     ai3 = ask_deepseek(ask)
     ai4 = ask_groq(ask)
     ai5 = ask_qwen(ask)
-    resp = ask_chatgpt(ask,ai1,ai2,ai3,ai4,ai5,internet(ask),history)
+    resp = ask_chatgpt(ask,ai1,ai2,ai3,ai4,ai5,history)
     return resp
 
 @app.route('/chat/api', methods=['POST'])
