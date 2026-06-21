@@ -143,7 +143,7 @@ def ask_deepseek(prompt):
                 {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=7000
+            max_tokens=100000
         )
         return response.choices[0].message.content
     except Exception as e:
