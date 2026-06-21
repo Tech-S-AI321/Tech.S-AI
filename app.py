@@ -193,7 +193,7 @@ def ask_chatgpt(prompt,ai1,ai2,ai3,ai4,ai5,history):
             ],
             max_tokens=7000
         )
-         print(response.choices[0].message.content)
+        print(response.choices[0].message.content)
         return response.choices[0].message.content
     except Exception as e:
         return f"Error: {e}" 
