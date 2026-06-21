@@ -101,7 +101,8 @@ def ask_gemini(prompt):
             config=types.GenerateContentConfig(
             system_instruction=f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."
             )
-        )
+        ) 
+        print(response.text) 
         return response.text
     except Exception as e:
         try:
