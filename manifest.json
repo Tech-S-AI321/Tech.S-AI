@@ -1,11 +1,11 @@
 {
-  "name": "Tech.S AI",
-  "short_name": "Tech.S AI",
+  "name": "Tech.S MedAI",
+  "short_name": "Tech.S MedAI",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#317EFB",
-  "description": "It is a AI web app hosted on render.",
+  "description": "It is a MedAI web app hosted on render.",
   "icons": [
     {
       "src": "/icon.png",
