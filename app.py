@@ -183,12 +183,12 @@ def ask_qwen(prompt):
 #ChatGPT
 gptoss_client = InferenceClient(api_key=hanu_key)
 
-def ask_chatgpt(prompt,ai1,ai2,ai3,ai4,ai5):
+def ask_chatgpt(prompt,ai1,ai2,ai3,ai4,ai5,history):
     try:
         response = gptoss_client.chat_completion(
             model="openai/gpt-oss-120b",
             messages=[
-                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments from these 5 ai responses-{ai1} ,{ai2} ,{ai3} ,{ai4} ,{ai5}.You have to make a report by mixixng the best ai responses and add you own knowledge also like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."},
+                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments from these 5 ai responses-{ai1} ,{ai2} ,{ai3} ,{ai4} ,{ai5}.You have to make a report by mixixng the best ai responses and add you own knowledge also like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed.And here is the user's history-{history}"},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
@@ -198,13 +198,13 @@ def ask_chatgpt(prompt,ai1,ai2,ai3,ai4,ai5):
     except Exception as e:
         return f"Error: {e}" 
 
-def get_ai_response(ask):
+def get_ai_response(ask,history):
     ai1 = "skipped"
     ai2 = "skipped"
     ai3 = "skipped"
     ai4 = "skipped"
     ai5 = "skipped"
-    resp = ask_chatgpt(ask,ai1,ai2,ai3,ai4,ai5)
+    resp = ask_chatgpt(ask,ai1,ai2,ai3,ai4,ai5, history)
     return resp
 
 @app.route('/chat/api', methods=['POST'])
@@ -229,7 +229,7 @@ def chat_api():
             print(f"Error fetching chat history: {e}")
         
         # Get AI response
-        ans = get_ai_response(ask)
+        ans = get_ai_response(ask,history)
         
         # Save to Supabase
         try:
@@ -260,7 +260,7 @@ def chat():
     ans = ''
     if request.method == 'POST':
         ask = request.form.get('chat')
-        ans = get_ai_response(ask)
+        ans = get_ai_response(ask,history)
     
     return render_template('chat.html', ans=ans, history=history)
 
