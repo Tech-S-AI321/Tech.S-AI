@@ -202,7 +202,7 @@ def get_ai_response(ask):
     ai1 = ask_gemini(ask)
     ai2 = "skipped"
     ai3 = "skipped"
-    ai4 = ask_groq(ask)
+    ai4 = "skipped"
     ai5 = ask_qwen(ask)
     resp = ask_chatgpt(ask,ai1,ai2,ai3,ai4,ai5)
     return resp
