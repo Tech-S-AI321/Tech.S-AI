@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#080e1a">
-    <title>Tech.S MedAI - Consultation</title>
+    <meta name="theme-color" content="#212121">
+    <title>Tech.S AI - Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
@@ -17,142 +17,124 @@
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-top">
             <div class="sidebar-logo">
-                <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Logo" width="36">
-                <div>
-                    <div class="logo-title">Tech.S MedAI</div>
-                    <div class="logo-sub">AI Medical Consultation</div>
-                </div>
+                <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Logo" width="28">
+                <span>Tech.S AI</span>
             </div>
             <button class="new-chat-btn" id="new-chat-btn">
                 <i class="fas fa-plus"></i>
-                <span>New Consultation</span>
+                <span>New chat</span>
             </button>
         </div>
 
-        <div class="sidebar-section-label"><i class="fas fa-clock-rotate-left"></i> Past Consultations</div>
+        <div class="sidebar-section-label">AI Model</div>
+        <div class="model-list" id="model-list">
+            <div class="model-item active" data-model="Gemini">
+                <img src="{{ url_for('static', filename='gemini.png') }}" alt="Gemini">
+                <span>Gemini</span>
+            </div>
+            <div class="model-item" data-model="ChatGPT">
+                <img src="{{ url_for('static', filename='chatgpt.png') }}" alt="ChatGPT">
+                <span>ChatGPT</span>
+            </div>
+            <div class="model-item" data-model="Deepseek">
+                <img src="{{ url_for('static', filename='deepseek.png') }}" alt="Deepseek">
+                <span>Deepseek</span>
+            </div>
+            <div class="model-item" data-model="Qwen">
+                <img src="{{ url_for('static', filename='qwen.png') }}" alt="Qwen">
+                <span>Qwen</span>
+            </div>
+            <div class="model-item" data-model="Meta Ai">
+                <img src="{{ url_for('static', filename='metaai.png') }}" alt="Meta AI">
+                <span>Meta AI</span>
+            </div>
+            <div class="model-item" data-model="Sarvam">
+                <img src="{{ url_for('static', filename='sarvam.png') }}" alt="Sarvam">
+                <span>Sarvam</span>
+            </div>
+        </div>
+
+        <div class="sidebar-section-label">History</div>
         <div class="history-list" id="history-list">
             {% if history %}
                 {% for chat in history %}
-                <div class="history-item" data-question="{{ chat.question }}" data-answer="{{ chat.answer }}">
-                    <i class="fas fa-file-medical"></i>
-                    <span>{{ chat.question[:42] }}{% if chat.question|length > 42 %}…{% endif %}</span>
+                <div class="history-item" data-question="{{ chat.question }}" data-answer="{{ chat.answer }}" data-model="{{ chat.ai_model }}">
+                    <i class="fas fa-message"></i>
+                    <span>{{ chat.question[:40] }}{% if chat.question|length > 40 %}...{% endif %}</span>
                 </div>
                 {% endfor %}
             {% else %}
-                <div class="no-history">No consultations yet</div>
+                <div class="no-history">No history yet</div>
             {% endif %}
         </div>
 
         <div class="sidebar-bottom">
-            <div class="status-badge">
-                <span class="status-dot"></span>
-                AI Doctors Online
-            </div>
             <a href="{{ url_for('home') }}" class="sidebar-action">
-                <i class="fas fa-house-medical"></i>
+                <i class="fas fa-home"></i>
                 <span>Home</span>
             </a>
-            <a href="#" class="sidebar-action logout"
-               onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='{{ url_for('logout') }}'; return false;">
+            <a href="#" class="sidebar-action" onclick="localStorage.clear(); sessionStorage.clear(); window.location.href='{{ url_for('logout') }}'; return false;">
                 <i class="fas fa-right-from-bracket"></i>
                 <span>Log out</span>
             </a>
         </div>
     </aside>
 
+    <!-- Mobile overlay -->
     <div class="overlay" id="overlay"></div>
 
-    <!-- Main -->
+    <!-- Main area -->
     <div class="main" id="main">
+        <!-- Top bar -->
         <header class="topbar">
             <button class="sidebar-toggle" id="sidebar-toggle">
                 <i class="fas fa-bars"></i>
             </button>
-            <div class="topbar-brand">
-                <div class="topbar-cross"><img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Tech.S Logo" class="topbar-logo-img"></div>
-                <div>
-                    <div class="tb-name">Tech.S MedAI</div>
-                    <div class="tb-spec">Powered by 5 AI Doctors</div>
-                </div>
-                <span class="online-dot"></span>
-            </div>
-            <div class="topbar-right">
-                <span class="hipaa-badge"><i class="fas fa-shield-halved"></i> Secure</span>
+            <div class="topbar-model" id="topbar-model">
+                <img src="{{ url_for('static', filename='gemini.png') }}" alt="model" id="topbar-model-img" width="20">
+                <span id="topbar-model-name">Gemini</span>
+                <i class="fas fa-chevron-down" style="font-size:0.7rem; opacity:0.6;"></i>
             </div>
         </header>
-
-        <!-- ECG bar -->
-        <div class="ecg-bar">
-            <svg viewBox="0 0 1200 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <polyline class="ecg-line" points="
-                    0,20 60,20 80,20 90,5 100,35 110,5 120,20 160,20
-                    220,20 240,20 250,5 260,35 270,5 280,20 320,20
-                    380,20 400,20 410,5 420,35 430,5 440,20 480,20
-                    540,20 560,20 570,5 580,35 590,5 600,20 640,20
-                    700,20 720,20 730,5 740,35 750,5 760,20 800,20
-                    860,20 880,20 890,5 900,35 910,5 920,20 960,20
-                    1020,20 1040,20 1050,5 1060,35 1070,5 1080,20 1120,20 1200,20
-                "/>
-            </svg>
-        </div>
 
         <!-- Messages -->
         <div class="messages" id="messages">
             <div class="welcome-screen" id="welcome-screen">
-                <div class="welcome-cross">
-                    <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Tech.S Logo" class="welcome-logo-img">
+                <div class="welcome-logo">
+                    <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Logo" width="56">
                 </div>
-                <h1>How can I help you<br>feel better today?</h1>
-                <p>Describe your symptoms or ask a medical question. Our 5 AI doctors will combine their knowledge to give you the best possible medical report.</p>
-
+                <h1>How can I help you today?</h1>
+                <p>Powered by Tech.S AI — choose a model and start chatting.</p>
                 <div class="suggestion-chips">
-                    <button class="chip" data-text="I have a severe headache and fever since 2 days, what could it be?">
-                        <i class="fas fa-head-side-virus"></i> Headache & Fever
-                    </button>
-                    <button class="chip" data-text="What are the early symptoms of diabetes?">
-                        <i class="fas fa-droplet"></i> Diabetes Symptoms
-                    </button>
-                    <button class="chip" data-text="I have chest pain and shortness of breath, should I be worried?">
-                        <i class="fas fa-heart-pulse"></i> Chest Pain
-                    </button>
-                    <button class="chip" data-text="What is the best diet for high blood pressure?">
-                        <i class="fas fa-apple-whole"></i> Blood Pressure Diet
-                    </button>
-                    <button class="chip" data-text="I have been feeling very tired and dizzy lately, what could be the cause?">
-                        <i class="fas fa-person-dots-from-line"></i> Fatigue & Dizziness
-                    </button>
-                    <button class="chip" data-text="What are the symptoms of anxiety and how can I manage it?">
-                        <i class="fas fa-brain"></i> Anxiety
-                    </button>
-                </div>
-
-                <div class="disclaimer-box">
-                    <i class="fas fa-triangle-exclamation"></i>
-                    <span>For emergencies, call <strong>112</strong> immediately. This AI provides general guidance only — always consult a licensed physician.</span>
+                    <button class="chip" data-text="Explain quantum computing simply">Explain quantum computing</button>
+                    <button class="chip" data-text="Write a Python hello world program">Write Python code</button>
+                    <button class="chip" data-text="What are the latest AI trends in 2025?">Latest AI trends</button>
+                    <button class="chip" data-text="Help me write a professional email">Write an email</button>
                 </div>
             </div>
         </div>
 
-        <!-- Input -->
+        <!-- Input area -->
         <div class="input-area">
             <div class="input-box">
-                <div class="input-icon"><i class="fas fa-stethoscope"></i></div>
-                <textarea id="chat-input" placeholder="Describe your symptoms or ask a medical question…" rows="1" autofocus></textarea>
+                <textarea id="chat-input" placeholder="Message Tech.S AI..." rows="1" autofocus></textarea>
                 <button class="send-btn" id="send-btn" disabled>
-                    <i class="fas fa-paper-plane"></i>
+                    <i class="fas fa-arrow-up"></i>
                 </button>
             </div>
-            <p class="disclaimer">AI-generated medical guidance only · Not a substitute for professional medical advice · Always consult your doctor</p>
+            <p class="disclaimer">Tech.S AI can make mistakes. Verify important information.</p>
         </div>
     </div>
+
+    <input type="hidden" name = 'aimodel' id="selected-model" value="Gemini">
 
     <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
-                    .then(() => console.log('Service Worker registered!'))
-                    .catch(err => console.log('SW failed:', err));
+                    .then(reg => console.log('Service Worker registered!'))
+                    .catch(err => console.log('Service Worker failed: ', err));
             });
         }
     </script>
