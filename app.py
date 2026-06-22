@@ -13,6 +13,7 @@ from huggingface_hub import InferenceClient
 from datetime import timedelta
 import time
 from flask import send_file
+from ddgs import DDGS
 
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), 'key.env'))
 
@@ -32,6 +33,10 @@ app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = os.getenv('SECRET_KEY')
 app.permanent_session_lifetime = timedelta(days=90)
 
+def internet(prompt):
+    with DDGS() as ddgs:
+        results = list(ddgs.text(prompt, max_results=5))
+    return results
 
 @app.route('/')
 def home():
@@ -92,16 +97,16 @@ def login():
     return render_template('login.html',error=error, success=success)
 
 #Gemini
-def ask_gemini(prompt):
+def ask_gemini(prompt,internet):
     try:
         client = genai.Client(api_key=gemini_key)
         response = client.models.generate_content(
             model="gemini-3.5-flash",
             contents=prompt,
             config=types.GenerateContentConfig(
-            system_instruction=f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."
+            system_instruction="You are the most knowledgeable ai in the world, so you have to answer the question in the best possible way,and in simplest way possible.You dont have to give very long answers.You have to talk like a friend.You can also use internet={internet}"
             )
-        )  
+        )
         return response.text
     except Exception as e:
         try:
@@ -109,7 +114,7 @@ def ask_gemini(prompt):
             model="gemini-2.5-flash-lite",
             contents=prompt,
             config=types.GenerateContentConfig(
-            system_instruction=f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."
+            system_instruction=f"You are the most knowledgeable ai in the world, so you have to answer the question in the best possible way,and in simplest way possible.You dont have to give very long answers.You have to talk like a friend."
             )
             )
             return response.text
@@ -117,13 +122,13 @@ def ask_gemini(prompt):
             return f"Error: {e}"
 
 #Sarvam
-def ask_sarvam(prompt):
+def ask_sarvam(prompt,internet):
     try:
         client = SarvamAI(api_subscription_key=sarvam_key)
         response = client.chat.completions(
             model="sarvam-m",
             messages=[
-                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."},                {"role": "user", "content": prompt}
+                {"role": "system", "content": f"You are the most knowledgeable ai in the world, so you have to answer the question in the best possible way,and in simplest way possible.You dont have to give very long answers.You have to talk like a friend.You can also use internet={internet}"},                {"role": "user", "content": prompt}
             ]
         )
         answer = response.choices[0].message.content
@@ -135,28 +140,28 @@ def ask_sarvam(prompt):
 #Deepseek (Reuse client to avoid recreating)
 deepseek_client = InferenceClient(api_key=hanu_key)
 
-def ask_deepseek(prompt):
+def ask_deepseek(prompt,internet):
     try:
         response = deepseek_client.chat_completion(
             model='deepseek-ai/DeepSeek-V3',
             messages=[
-                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."},
+                {"role": "system", "content": f"You are the most knowledgeable ai in the world, so you have to answer the question in the best possible way,and in simplest way possible.You dont have to give very long answers.You have to talk like a friend.You can also use internet={internet}"},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=100000
+            max_tokens=7000
         )
         return response.choices[0].message.content
     except Exception as e:
         return f"Error: {e}"
 
 #Groq
-def ask_groq(prompt):
+def ask_groq(prompt,internet):
     try:
         client = Groq(api_key=groq_key)
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
-                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."},
+                {"role": "system", "content": f"You are the most knowledgeable ai in the world, so you have to answer the question in the best possible way,and in simplest way possible.You dont have to give very long answers.You have to talk like a friend.You can also use internet={internet}"},
                 {"role": "user", "content": prompt}
             ]
         )
@@ -167,12 +172,12 @@ def ask_groq(prompt):
 #Qwen (Reuse client to avoid recreating)
 qwen_client = InferenceClient(api_key=hanu_key)
 
-def ask_qwen(prompt):
+def ask_qwen(prompt,internet):
     try:
         response = qwen_client.chat_completion(
             model="Qwen/Qwen2.5-72B-Instruct",
             messages=[
-                {"role": "system", "content":f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments.You have to make a report like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."},
+                {"role": "system", "content":f"You are the most knowledgeable ai in the world, so you have to answer the question in the best possible way,and in simplest way possible.You dont have to give very long answers.You have to talk like a friend.You can also use internet={internet}"},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
@@ -183,29 +188,35 @@ def ask_qwen(prompt):
 #ChatGPT
 gptoss_client = InferenceClient(api_key=hanu_key)
 
-def ask_chatgpt(prompt,ai1,ai2,ai3,ai4,ai5):
+def ask_chatgpt(prompt,internet):
     try:
         response = gptoss_client.chat_completion(
             model="openai/gpt-oss-120b",
             messages=[
-                {"role": "system", "content": f"You are the best doctor in the world, so you have to help the patient with his/her disease, and give best possible advices and treatments from these 5 ai responses-{ai1} ,{ai2} ,{ai3} ,{ai4} ,{ai5}.You have to make a report by mixixng the best ai responses and add you own knowledge also like a real doctor for the patient and in simplest way possible.And at the last you have to tell the patient to consult a specific doctor if needed."},
+                {"role": "system", "content": f"You are the most knowledgeable ai in the world, so you have to answer the question in the best possible way,and in simplest way possible.You dont have to give very long answers.You have to talk like a friend.You can also use internet={internet}"},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=7000
         )
-        print(response.choices[0].message.content)
         return response.choices[0].message.content
     except Exception as e:
         return f"Error: {e}" 
 
-def get_ai_response(ask):
-    ai1 = "skipped"
-    ai2 = "skipped"
-    ai3 = "skipped"
-    ai4 = "skipped"
-    ai5 = "skipped"
-    resp = ask_chatgpt(ask,ai1,ai2,ai3,ai4,ai5)
-    return resp
+def get_ai_response(ai,ask):
+    if ai == 'Gemini':
+        return ask_gemini(ask,internet(ask))
+    elif ai == 'ChatGPT':
+        return ask_chatgpt(ask,internet(ask))
+    elif ai == 'Qwen':
+        return ask_qwen(ask,internet(ask))
+    elif ai == 'Deepseek':
+        return ask_deepseek(ask,internet(ask))
+    elif ai == 'Meta Ai':
+        return ask_groq(ask,internet(ask))
+    elif ai == 'Sarvam':
+        return ask_sarvam(ask,internet(ask))
+    else:
+        return"No AI model found!"
 
 @app.route('/chat/api', methods=['POST'])
 def chat_api():
@@ -216,6 +227,7 @@ def chat_api():
     try:
         data = request.get_json(force=True)
         ask = data.get('chat')
+        ai = data.get('aimodel')
         
         # Get chat history
         try:
@@ -229,7 +241,7 @@ def chat_api():
             print(f"Error fetching chat history: {e}")
         
         # Get AI response
-        ans = get_ai_response(ask)
+        ans = get_ai_response(ai,ask)
         
         # Save to Supabase
         try:
@@ -260,7 +272,8 @@ def chat():
     ans = ''
     if request.method == 'POST':
         ask = request.form.get('chat')
-        ans = get_ai_response(ask)
+        ans = get_ai_response(ask,history)
+        ai = request.form.get('aimodel')
     
     return render_template('chat.html', ans=ans, history=history)
 
