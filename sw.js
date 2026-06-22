@@ -1,4 +1,4 @@
-const CACHE_NAME = 'techsai-cache-v5'; // Bumped version to force cache update
+const CACHE_NAME = 'techsai-cache-v7'; // Bumped version to force cache update
 const ASSETS = [
   // ONLY cache static assets that never change based on login state
   '/static/css/styles.css',
