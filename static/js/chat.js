@@ -1,22 +1,50 @@
-const chatInput     = document.getElementById('chat-input');
-const sendBtn       = document.getElementById('send-btn');
-const messagesEl    = document.getElementById('messages');
+const selectedModelInput = document.getElementById('selected-model');
+const chatInput = document.getElementById('chat-input');
+const sendBtn = document.getElementById('send-btn');
+const messagesEl = document.getElementById('messages');
 const welcomeScreen = document.getElementById('welcome-screen');
-const historyItems  = document.querySelectorAll('.history-item');
-const newChatBtn    = document.getElementById('new-chat-btn');
+const topbarModelImg = document.getElementById('topbar-model-img');
+const topbarModelName = document.getElementById('topbar-model-name');
+const modelItems = document.querySelectorAll('.model-item');
+const historyItems = document.querySelectorAll('.history-item');
+const newChatBtn = document.getElementById('new-chat-btn');
 const sidebarToggle = document.getElementById('sidebar-toggle');
-const sidebar       = document.getElementById('sidebar');
-const overlay       = document.getElementById('overlay');
-const chips         = document.querySelectorAll('.chip');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+const chips = document.querySelectorAll('.chip');
 
-// Configure marked for safe rendering
-marked.setOptions({ breaks: true, gfm: true });
+const modelImages = {
+    'Gemini':    '/static/gemini.png',
+    'ChatGPT':   '/static/chatgpt.png',
+    'Deepseek':  '/static/deepseek.png',
+    'Qwen':      '/static/qwen.png',
+    'Meta Ai':   '/static/metaai.png',
+    'Sarvam':    '/static/sarvam.png',
+};
 
-// ── Sidebar (mobile) ─────────────────────────────────────
+function getModelImg(model) {
+    return modelImages[model] || '/static/logo.jpeg';
+}
+
+// ── Model selection ──────────────────────────────────────
+modelItems.forEach(item => {
+    item.addEventListener('click', () => {
+        modelItems.forEach(m => m.classList.remove('active'));
+        item.classList.add('active');
+        const model = item.dataset.model;
+        selectedModelInput.value = model;
+        topbarModelName.textContent = model;
+        topbarModelImg.src = getModelImg(model);
+        closeSidebar();
+    });
+});
+
+// ── Sidebar toggle (mobile) ──────────────────────────────
 sidebarToggle.addEventListener('click', () => {
     sidebar.classList.toggle('open');
     overlay.classList.toggle('show');
 });
+
 overlay.addEventListener('click', closeSidebar);
 
 function closeSidebar() {
@@ -24,7 +52,7 @@ function closeSidebar() {
     overlay.classList.remove('show');
 }
 
-// ── New consultation ─────────────────────────────────────
+// ── New chat ─────────────────────────────────────────────
 newChatBtn.addEventListener('click', () => {
     clearChat();
     closeSidebar();
@@ -46,14 +74,28 @@ chips.forEach(chip => {
     });
 });
 
-// ── Past consultations ────────────────────────────────────
+// ── History items ─────────────────────────────────────────
 historyItems.forEach(item => {
     item.addEventListener('click', () => {
+        const question = item.dataset.question;
+        const answer = item.dataset.answer;
+        const model = item.dataset.model;
+
         clearChat();
         welcomeScreen.style.display = 'none';
-        appendUserMessage(item.dataset.question);
-        appendAiReport(item.dataset.answer);
+
+        appendMessage('user', question, model);
+        appendMessage('ai', answer, model);
         closeSidebar();
+
+        if (model) {
+            selectedModelInput.value = model;
+            topbarModelName.textContent = model;
+            topbarModelImg.src = getModelImg(model);
+            modelItems.forEach(m => {
+                m.classList.toggle('active', m.dataset.model === model);
+            });
+        }
     });
 });
 
@@ -64,96 +106,62 @@ chatInput.addEventListener('input', () => {
     sendBtn.disabled = chatInput.value.trim() === '';
 });
 
-// ── Enter to send ────────────────────────────────────────
+// ── Send on Enter (Shift+Enter = newline) ────────────────
 chatInput.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         if (!sendBtn.disabled) sendMessage();
     }
 });
+
 sendBtn.addEventListener('click', sendMessage);
 
-// ── Append user message ───────────────────────────────────
-function appendUserMessage(text) {
+// ── Append message ───────────────────────────────────────
+function appendMessage(role, text, model) {
     welcomeScreen.style.display = 'none';
+
     const row = document.createElement('div');
-    row.className = 'message-row user';
+    row.className = `message-row ${role}`;
+
+    if (role === 'ai') {
+        const avatar = document.createElement('img');
+        avatar.className = 'ai-avatar';
+        avatar.src = getModelImg(model || selectedModelInput.value);
+        avatar.alt = 'AI';
+        row.appendChild(avatar);
+    }
+
     const bubble = document.createElement('div');
-    bubble.className = 'bubble user-bubble';
-    bubble.textContent = text;
+    bubble.className = 'bubble';
+    if (role === 'ai') {
+        bubble.classList.add('markdown');
+        bubble.innerHTML = marked.parse(text);
+    } else {
+        bubble.textContent = text;
+    }
     row.appendChild(bubble);
-    messagesEl.appendChild(row);
-    scrollToBottom();
-}
 
-// ── Append AI medical report (rendered markdown) ──────────
-function appendAiReport(markdownText) {
-    welcomeScreen.style.display = 'none';
-
-    const row = document.createElement('div');
-    row.className = 'message-row ai';
-
-    const card = document.createElement('div');
-    card.className = 'report-card';
-
-    // Report header
-    const header = document.createElement('div');
-    header.className = 'report-header';
-    header.innerHTML = `
-        <div class="report-header-left">
-            <div class="report-icon"><i class="fas fa-file-medical"></i></div>
-            <div>
-                <div class="report-title">AI Medical Report</div>
-                <div class="report-sub">Tech.S MedAI · Powered by 5 AI Doctors</div>
-            </div>
-        </div>
-        <div class="report-timestamp">${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
-    `;
-    card.appendChild(header);
-
-    // Report body — rendered markdown
-    const body = document.createElement('div');
-    body.className = 'report-body md-content';
-    body.innerHTML = marked.parse(markdownText);
-    card.appendChild(body);
-
-    // Report footer
-    const footer = document.createElement('div');
-    footer.className = 'report-footer';
-    footer.innerHTML = `<i class="fas fa-triangle-exclamation"></i> This is AI-generated guidance. Always consult a licensed physician for diagnosis and treatment.`;
-    card.appendChild(footer);
-
-    row.appendChild(card);
     messagesEl.appendChild(row);
     scrollToBottom();
 }
 
 // ── Typing indicator ─────────────────────────────────────
-function showTyping() {
+function showTyping(model) {
     const row = document.createElement('div');
     row.className = 'message-row ai';
     row.id = 'typing-row';
 
-    const card = document.createElement('div');
-    card.className = 'report-card typing-card';
-    card.innerHTML = `
-        <div class="report-header">
-            <div class="report-header-left">
-                <div class="report-icon"><i class="fas fa-stethoscope fa-spin-pulse"></i></div>
-                <div>
-                    <div class="report-title">Consulting AI Doctors…</div>
-                    <div class="report-sub">Gemini · Deepseek · Qwen · Sarvam · Meta AI</div>
-                </div>
-            </div>
-        </div>
-        <div class="typing-body">
-            <div class="typing-dots">
-                <span></span><span></span><span></span>
-            </div>
-            <span class="typing-text">Analysing your symptoms across 5 models</span>
-        </div>
-    `;
-    row.appendChild(card);
+    const avatar = document.createElement('img');
+    avatar.className = 'ai-avatar';
+    avatar.src = getModelImg(model || selectedModelInput.value);
+    avatar.alt = 'AI';
+    row.appendChild(avatar);
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+    row.appendChild(bubble);
+
     messagesEl.appendChild(row);
     scrollToBottom();
 }
@@ -166,6 +174,7 @@ function removeTyping() {
 // ── Send message ─────────────────────────────────────────
 async function sendMessage() {
     const message = chatInput.value.trim();
+    const model = selectedModelInput.value;
     if (!message) return;
 
     chatInput.value = '';
@@ -173,28 +182,28 @@ async function sendMessage() {
     sendBtn.disabled = true;
     chatInput.disabled = true;
 
-    appendUserMessage(message);
-    showTyping();
+    appendMessage('user', message, model);
+    showTyping(model);
 
     try {
         const res = await fetch('/chat/api', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat: message })
+            body: JSON.stringify({ aimodel: model, chat: message })
         });
 
         removeTyping();
 
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            appendAiReport('**Error:** ' + (err.error || 'Something went wrong. Please try again.'));
+            appendMessage('ai', 'Error: ' + (err.error || 'Something went wrong. Please try again.'), model);
         } else {
             const data = await res.json();
-            appendAiReport(data.ans || '_No response received._');
+            appendMessage('ai', data.ans || 'No response received.', model);
         }
     } catch (err) {
         removeTyping();
-        appendAiReport('**Network error.** Please check your connection and try again.');
+        appendMessage('ai', 'Network error. Please check your connection and try again.', model);
         console.error(err);
     } finally {
         chatInput.disabled = false;
@@ -203,6 +212,7 @@ async function sendMessage() {
     }
 }
 
+// ── Scroll helpers ───────────────────────────────────────
 function scrollToBottom() {
     messagesEl.scrollTop = messagesEl.scrollHeight;
 }
