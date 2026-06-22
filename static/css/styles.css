@@ -923,3 +923,47 @@ body.light-mode .alert-success {
         margin: 1rem;
     }
 }
+/* ── Announcement Banner ─────────────────────────────────── */
+.announce-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #FF8C00, #FFD700, #FF6B35);
+    color: #111;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(255,165,0,0.45);
+    animation: slideDown 0.4s ease;
+}
+.announce-banner a {
+    color: #111;
+    font-weight: 700;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+.announce-banner a:hover { opacity: 0.75; }
+.announce-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #111;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+.announce-close:hover { opacity: 1; background: rgba(0,0,0,0.1); }
+.announce-banner.hidden { display: none; }
+@keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
