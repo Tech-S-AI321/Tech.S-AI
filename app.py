@@ -126,7 +126,7 @@ def ask_sarvam(prompt,internet):
     try:
         client = SarvamAI(api_subscription_key=sarvam_key)
         response = client.chat.completions(
-            model="sarvam-m",
+            model="sarvam-30b",
             messages=[
                 {"role": "system", "content": f"You are the most knowledgeable ai in the world, so you have to answer the question in the best possible way,and in simplest way possible.You dont have to give very long answers.You have to talk like a friend.You can also use internet={internet}"},                {"role": "user", "content": prompt}
             ]
